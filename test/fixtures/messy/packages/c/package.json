@@ -1,0 +1,1 @@
+{ "name": "c", "version": "1.0.0", "license": "MIT", "dependencies": { "a": "workspace:^", "react": "^17.0.2" } }

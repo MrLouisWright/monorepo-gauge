@@ -1,0 +1,44 @@
+name: 'monorepo-gauge'
+description: 'Check workspaces for version drift, mismatched shared deps, missing fields and circular internal deps'
+author: 'Louis Wright'
+branding: { icon: 'layers', color: 'blue' }
+inputs:
+  path: { description: 'Project directory (default: repository root)', default: '.' }
+  fail-on: { description: 'critical | high | medium | low | info | none', default: 'high' }
+  config: { description: 'Path to JSON config file', default: '' }
+  sarif: { description: 'Write SARIF to this path', default: '' }
+  json: { description: 'Write JSON report to this path', default: '' }
+  job-summary: { description: 'Write the Markdown report to the job summary (true/false)', default: 'true' }
+  args: { description: 'Extra CLI arguments', default: '' }
+outputs:
+  markdown-file: { description: 'Path of the Markdown report', value: '${{ steps.run.outputs.markdown-file }}' }
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      with: { node-version: '20' }
+    - id: run
+      shell: bash
+      env:
+        MG_PATH: ${{ inputs.path }}
+        MG_FAIL_ON: ${{ inputs.fail-on }}
+        MG_CONFIG: ${{ inputs.config }}
+        MG_SARIF: ${{ inputs.sarif }}
+        MG_JSON: ${{ inputs.json }}
+        MG_SUMMARY: ${{ inputs.job-summary }}
+        MG_ARGS: ${{ inputs.args }}
+        MG_BIN: ${{ github.action_path }}/bin/monorepo-gauge.js
+      run: |
+        md="$RUNNER_TEMP/monorepo-gauge.md"
+        args=("$MG_PATH" --fail-on "$MG_FAIL_ON" --markdown "$md")
+        [ -n "$MG_CONFIG" ] && args+=(--config "$MG_CONFIG")
+        [ -n "$MG_SARIF" ] && args+=(--sarif "$MG_SARIF")
+        [ -n "$MG_JSON" ] && args+=(--json "$MG_JSON")
+        set +e
+        # shellcheck disable=SC2086
+        node "$MG_BIN" "${args[@]}" $MG_ARGS
+        code=$?
+        set -e
+        echo "markdown-file=$md" >> "$GITHUB_OUTPUT"
+        if [ "$MG_SUMMARY" = "true" ] && [ -f "$md" ]; then cat "$md" >> "$GITHUB_STEP_SUMMARY"; fi
+        exit $code

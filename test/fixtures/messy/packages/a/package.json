@@ -1,0 +1,1 @@
+{ "name": "a", "version": "1.0.0", "description": "A", "license": "MIT", "repository": { "type": "git", "url": "git+https://github.com/x/messy.git" }, "dependencies": { "b": "workspace:^", "react": "^18.2.0", "priv": "workspace:*" }, "devDependencies": { "typescript": "^5.2.0" } }

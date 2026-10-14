@@ -1,0 +1,54 @@
+{
+  "name": "monorepo-gauge",
+  "version": "1.0.0",
+  "description": "Hygiene checks for npm/yarn/pnpm workspaces: circular internal dependencies, internal ranges that no longer match, shared dependency drift, duplicate names, public packages depending on private ones, missing package fields and version drift. Text/JSON/SARIF/Markdown, allowlist with expiry, GitHub Action. Zero deps.",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "monorepo-gauge": "bin/monorepo-gauge.js"
+  },
+  "files": [
+    "src",
+    "bin",
+    "action.yml",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "keywords": [
+    "monorepo",
+    "workspaces",
+    "pnpm",
+    "yarn",
+    "npm",
+    "lerna",
+    "dependencies",
+    "lint",
+    "sarif",
+    "github-action"
+  ],
+  "author": "Louis Wright <hello@louiswright.co.uk> (https://github.com/MrLouisWright)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MrLouisWright/monorepo-gauge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MrLouisWright/monorepo-gauge/issues"
+  },
+  "homepage": "https://github.com/MrLouisWright/monorepo-gauge#readme"
+}

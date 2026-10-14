@@ -1,0 +1,1 @@
+{ "name": "@clean/core", "version": "2.1.0", "description": "Core", "license": "MIT", "type": "module", "engines": { "node": ">=18" }, "repository": { "type": "git", "url": "git+https://github.com/x/clean.git", "directory": "packages/core" }, "dependencies": { "lodash": "^4.17.21" } }
