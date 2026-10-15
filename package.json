@@ -1,14 +1,21 @@
 {
   "name": "monorepo-gauge",
   "version": "1.0.0",
-  "description": "Hygiene checks for npm/yarn/pnpm workspaces: circular internal dependencies, internal ranges that no longer match, shared dependency drift, duplicate names, public packages depending on private ones, missing package fields and version drift. Text/JSON/SARIF/Markdown, allowlist with expiry, GitHub Action. Zero deps.",
+  "description": "Hygiene checks for npm/yarn/pnpm workspaces: circular internal dependencies, internal ranges that no longer match, shared dependency drift, duplicate names, public packages depending on private ones, per-package field checks via pkg-field-gauge, workspace: protocol consistency, syncpack-style version groups and version drift. Text/JSON/SARIF/Markdown, allowlist with expiry, GitHub Action. --fix for ranges and versions.",
   "type": "module",
-  "main": "./src/index.js",
-  "types": "./src/index.d.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/index.d.ts",
-      "default": "./src/index.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./package.json": "./package.json"
   },
@@ -16,6 +23,7 @@
     "monorepo-gauge": "bin/monorepo-gauge.js"
   },
   "files": [
+    "dist",
     "src",
     "bin",
     "action.yml",
@@ -27,7 +35,10 @@
     "node": ">=18"
   },
   "scripts": {
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/*.test.js",
+    "build": "node scripts/build.mjs",
+    "pretest": "npm run build",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "monorepo",
@@ -54,5 +65,12 @@
   "bugs": {
     "url": "https://github.com/MrLouisWright/monorepo-gauge/issues"
   },
-  "homepage": "https://mrlouiswright.github.io/monorepo-gauge/"
+  "homepage": "https://mrlouiswright.github.io/monorepo-gauge/",
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "pkg-field-gauge": "^1.0.1"
+  }
 }

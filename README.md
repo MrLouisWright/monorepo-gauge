@@ -6,15 +6,25 @@
 
 Monorepos rot quietly. A package bumps to 2.0.0 while a sibling still asks for `^1.0.0`, so the package manager fetches the old copy from the registry instead of linking the local one. One app moves to React 18 and another stays on 17. Two packages end up importing each other. A published package depends on a private one that users can never install. `monorepo-gauge` reads your workspace layout and reports these problems with the file, a severity and a **concrete fix**.
 
-CLI, library and GitHub Action. Node.js 18+, **zero runtime dependencies**. By Louis Wright.
+CLI, library and GitHub Action. Node.js 18+, one runtime dependency ([pkg-field-gauge](https://www.npmjs.com/package/pkg-field-gauge)). By Louis Wright.
 
 ## Features
 
 - **Workspace discovery:** `package.json` `workspaces` (array or `{ packages }`), `pnpm-workspace.yaml` and `lerna.json`, with `*`, `**` and `!exclusions`. The package manager is detected from the lockfile, `.yarnrc.yml` and `packageManager`.
 - **Internal graph:** cycles through `dependencies`/`peerDependencies`/`optionalDependencies` (high) and through `devDependencies` (low), each reported once as `a → b → c → a`. Internal ranges are checked against the local version with a proper SemVer range matcher (`^`, `~`, x-ranges, hyphen ranges, `||`, `workspace:^1.2.0`). Published packages depending on private ones are caught.
 - **Shared dependency drift:** the same external dependency with different majors (medium) or different ranges in the same major (low) across packages and the root, listing who uses what.
-- **Package fields:** required fields for publishable packages (default `name`, `version`, `description`, `license`, `repository`), `repository.directory` pointing at the right folder, and `license`/`engines.node`/`type` consistency. Under fixed versioning (lerna `version`, or `--versioning fixed`) package versions must match.
+- **Package fields, delegated to [pkg-field-gauge](https://www.npmjs.com/package/pkg-field-gauge):** every workspace runs through pkg-field-gauge's `checkPackage` (entry points, `exports`, types, `bin`, `files`, licence, repository, description, keywords…) and each result is reported as `package-field` with pkg-field-gauge's own severity and a subject like `@acme/ui:entry-missing:main:dist/index.js`. Private workspaces skip the publishing-only rules. Extra `requiredFields` (e.g. `engines.node`, `author`) become `required-field` results. monorepo-gauge itself keeps the cross-package checks: `repository.directory` pointing at the right folder, and `license`/`engines.node`/`type` consistency. Under fixed versioning (lerna `version`, or `--versioning fixed`) package versions must match.
+- **`workspace:` protocol:** mixed `workspace:^` / `workspace:~` / `workspace:*` / `workspace:<range>` styles are flagged (`workspace-protocol-inconsistent`, majority wins or set `workspaceProtocolStyle`), and `workspace:` under npm or yarn classic, which fails with `EUNSUPPORTEDPROTOCOL`, is high (`workspace-protocol-unsupported`).
+- **Version groups (syncpack-style):** `versionGroups` assign dependencies × packages to a policy: `pin` (exact `pinVersion`), `sameRange`, `banned` or `ignored`. Unmatched dependencies use the default "highest range wins" drift check.
+- **`--fix`:** rewrites `package.json` files in place (keeping indentation): internal ranges, `workspace:` protocol and style, fixed-mode versions, same-major range drift, `pin` groups and `repository.directory`. Major drift is only aligned with `--fix-majors`. `--dry-run` prints the changes without writing. Re-run your package manager's install afterwards to update the lockfile.
 - **Output:** text, JSON, SARIF 2.1.0 and Markdown; `--fail-on`; exit codes 0/1/2; allowlist entries with expiry dates.
+
+
+
+### Module formats and types
+
+Ships **ESM and CommonJS** (`import` and `require` both work, via `exports`), with TypeScript declarations generated from the source at build time. Tests run on Node 18/20/22 in GitHub Actions (`test/`), including require/import checks against the packed tarball; releases are published with npm provenance.
+
 
 ## Rules
 
@@ -27,12 +37,16 @@ CLI, library and GitHub Action. Node.js 18+, **zero runtime dependencies**. By L
 | `invalid-package-json` | high | Workspace package.json cannot be parsed |
 | `dependency-major-drift` | medium | Packages require different major versions of the same dependency |
 | `root-not-private` | medium | Workspace root is not marked "private": true |
-| `missing-field` | medium | Package is missing a required package.json field |
+| `package-field` | from pkg-field-gauge | Finding from pkg-field-gauge for one workspace package |
+| `banned-dependency` | high | Dependency is banned by a versionGroups policy |
+| `workspace-protocol-unsupported` | high | workspace: protocol with npm or yarn classic |
+| `version-group-mismatch` | medium | Range breaks its versionGroups policy (pin / sameRange) |
 | `workspace-empty` | medium | Workspace pattern matches no packages |
 | `dependency-range-drift` | low | Packages use different ranges for the same dependency (same major) |
 | `version-drift` | low | Package versions differ under fixed/locked versioning |
 | `field-drift` | low | license / engines / type differs from the rest of the monorepo |
 | `repository-directory` | low | repository.directory is missing or wrong |
+| `workspace-protocol-inconsistent` | low | Internal dependencies mix workspace: styles |
 | `circular-dev-dependency` | low | Cycle through devDependencies |
 | `workspace-protocol` | info | Internal dependency does not use the workspace: protocol |
 | `allowlist-expired` | medium | Allowlist entry has expired |
@@ -76,6 +90,15 @@ Workspace
       --ignore-packages <g>   Package names or dirs to skip (globs, comma-separated)
       --ignore-deps <g>       External dependencies to skip in drift checks
       --include-peers         Include peerDependencies in drift checks
+      --protocol-style <s>    Expected workspace: style: ^ | ~ | * | range (default: majority)
+      --no-package-fields     Skip per-package checks (delegated to pkg-field-gauge)
+
+Fixing
+      --fix                   Rewrite package.json files: internal ranges, workspace: protocol,
+                              fixed-mode versions, same-major range drift, versionGroups pins,
+                              repository.directory
+      --fix-majors            Also align dependencies across majors (may break code)
+      --dry-run               With --fix, only print what would change
 
 Common
   -c, --config <file>     JSON config (default: .monorepo-gauge.json or "monorepoGauge" in package.json)
@@ -105,12 +128,23 @@ Options can live in `.monorepo-gauge.json` (or a `"monorepoGauge"` key in `packa
   ],
   "requiredFields": ["name", "version", "description", "license", "repository", "engines"],
   "versioning": "fixed",
-  "ignorePackages": ["@acme/sandbox-*"]
+  "ignorePackages": ["@acme/sandbox-*"],
+  "workspaceProtocolStyle": "^",
+  "packageFields": { "skip": ["keywords-missing"] },
+  "versionGroups": [
+    { "label": "legacy app", "packages": ["@acme/legacy-*"], "policy": "ignored" },
+    { "dependencies": ["react", "react-dom"], "policy": "pin", "pinVersion": "18.3.1" },
+    { "dependencies": ["moment"], "policy": "banned", "reason": "Use date-fns." },
+    { "dependencies": ["@types/**"], "dependencyTypes": ["devDependencies"], "policy": "sameRange" }
+  ]
 }
 ```
 
 - **`severity`** changes a rule's severity, or turns it `"off"`.
 - **`allowlist`** entries suppress matching findings. Each needs a `reason` and matches on any combination of `rule`, `file`, `subject` (globs with `*`) and `match` (a substring of the message). Add `expires` (`YYYY-MM-DD`) so the exception is time-boxed: once it lapses the finding comes back along with an `allowlist-expired` finding (medium). Entries that no longer match anything are reported as `allowlist-unused` (info).
+
+- **`versionGroups`** are tried in order; the first group whose `dependencies`, `packages` (globs, `(root)` for the root package) and optional `dependencyTypes` match a usage owns it.
+- **`packageFields`** is passed to pkg-field-gauge: `rules` (only these), `skip`, `pack: true` (also check the packed tarball); `false` turns per-package checks off.
 
 Other config keys: `requiredFieldsPrivate` (default `["name"]`), `consistentFields` (default `["license", "engines.node", "type"]`), `ignoreDeps`, `includePeers`, and `"workspaceProtocol": false` to silence the `workspace:` suggestion.
 
@@ -155,8 +189,9 @@ The action runs the bundled CLI with Node 20; it has no dependencies to install.
 ## Library
 
 ```js
-import { check, satisfies, findCycles } from 'monorepo-gauge';
+import { check, applyFixes, satisfies, findCycles } from 'monorepo-gauge';
 const report = check('.', { versioning: 'fixed' });
+check('.', { fix: true, fixDryRun: true }).fixed; // [{ rule, file, path, from, to }]
 for (const p of report.info.packages) console.log(p.name, p.internalDeps);
 satisfies('2.0.0', '^1.0.0'); // false
 ```

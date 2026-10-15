@@ -1,1 +1,26 @@
-{ "name": "@clean/cli", "version": "1.0.0", "description": "CLI", "license": "MIT", "type": "module", "engines": { "node": ">=18" }, "repository": { "type": "git", "url": "git+https://github.com/x/clean.git", "directory": "packages/cli" }, "dependencies": { "@clean/core": "^2.0.0", "lodash": "^4.17.21" }, "devDependencies": { "typescript": "^5.4.0" } }
+{
+  "name": "@clean/cli",
+  "version": "1.0.0",
+  "description": "CLI",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/x/clean.git",
+    "directory": "packages/cli"
+  },
+  "dependencies": {
+    "@clean/core": "^2.0.0",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  },
+  "keywords": [
+    "x"
+  ],
+  "homepage": "https://example.com"
+}

@@ -15,6 +15,12 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npm test
       - run: npm pack --dry-run
+      - name: Require + import from packed tarball
+        run: |
+          npm pack --silent
+          mkdir -p /tmp/smoke && cd /tmp/smoke && npm init -y >/dev/null && npm i "$GITHUB_WORKSPACE"/monorepo-gauge-*.tgz
+          node -e "const m=require('monorepo-gauge'); if(!Object.keys(m).length) process.exit(1)"
+          node --input-type=module -e "const m=await import('monorepo-gauge'); if(!Object.keys(m).length) process.exit(1)"
       - name: Dogfood
         run: |
           node bin/monorepo-gauge.js test/fixtures/clean --fail-on low

@@ -21,7 +21,8 @@ test('messy pnpm monorepo: every rule', () => {
     'private-dependency': ['a>priv'],
     'circular-dependency': ['a>b>c'],
     'internal-range-mismatch': ['b>c'],
-    'missing-field': ['c:description', 'c:repository'],
+    'package-field': ['c:description-missing:description', 'c:homepage-missing:homepage', 'c:keywords-missing:keywords', 'c:repository-missing:repository'],
+    'workspace-protocol-inconsistent': ['a>priv', 'priv>a'],
     'dependency-major-drift': ['react'],
     'workspace-empty': ['apps/*'],
     'root-not-private': [undefined],
@@ -44,7 +45,7 @@ test('fixed versioning via lerna.json or option', () => {
 test('required fields configurable; private packages need only a name', () => {
   const d = repo({ 'package.json': { private: true, workspaces: ['p/*'] }, 'p/a/package.json': { name: 'a', private: true }, 'p/b/package.json': pub('b', '1.0.0', { dir: 'p/b' }) });
   assert.deepEqual(by(check(d, { now })), {});
-  assert.deepEqual(by(check(d, { now, requiredFields: ['name', 'engines.node'] })), { 'missing-field': ['b:engines.node'] });
+  assert.deepEqual(by(check(d, { now, requiredFields: ['name', 'engines.node'] })), { 'package-field': ['b:required-field:engines.node'] });
 });
 test('ignorePackages and ignoreDeps', () => {
   const r = check(FX('messy'), { now, ignorePackages: ['dup*', 'packages/priv'], ignoreDeps: ['react', 'typescript'] });

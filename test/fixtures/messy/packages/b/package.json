@@ -1,1 +1,18 @@
-{ "name": "b", "version": "2.0.0", "description": "B", "license": "ISC", "repository": { "type": "git", "url": "git+https://github.com/x/messy.git", "directory": "pkgs/b" }, "dependencies": { "c": "^2.0.0" } }
+{
+  "name": "b",
+  "version": "2.0.0",
+  "description": "B",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/x/messy.git",
+    "directory": "pkgs/b"
+  },
+  "dependencies": {
+    "c": "^2.0.0"
+  },
+  "keywords": [
+    "x"
+  ],
+  "homepage": "https://example.com"
+}

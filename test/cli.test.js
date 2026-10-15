@@ -21,8 +21,8 @@ test('flags and config', () => {
   assert.match(run([FX('messy'), '--versioning', 'fixed', '-f', 'json']).out, /version-drift/);
   assert.match(run([FX('clean'), '--require', 'name,funding', '--fail-on', 'medium']).out, /funding/);
   const d = repo({ 'package.json': { private: true, workspaces: ['p/*'], monorepoGauge: { requiredFields: ['name', 'author'] } }, 'p/a/package.json': { name: 'a', version: '1.0.0' } });
-  assert.match(run([d, '--fail-on', 'medium']).out, /no "author"/);
-  writeFileSync(join(d, '.monorepo-gauge.json'), JSON.stringify({ severity: { 'missing-field': 'nope' } }));
+  assert.match(run([d, '--fail-on', 'medium']).out, /required field "author" is missing/);
+  writeFileSync(join(d, '.monorepo-gauge.json'), JSON.stringify({ severity: { 'package-field': 'nope' } }));
   assert.equal(run([d]).code, 2);
 });
 test('usage errors', () => {
