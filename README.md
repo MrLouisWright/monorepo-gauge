@@ -1,5 +1,7 @@
 # monorepo-gauge
 
+[![npm version](https://img.shields.io/npm/v/monorepo-gauge.svg)](https://www.npmjs.com/package/monorepo-gauge) [![CI](https://github.com/MrLouisWright/monorepo-gauge/actions/workflows/ci.yml/badge.svg)](https://github.com/MrLouisWright/monorepo-gauge/actions/workflows/ci.yml) [![Node](https://img.shields.io/node/v/monorepo-gauge.svg)](https://nodejs.org) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 > Hygiene checks for npm, yarn and pnpm workspaces: circular internal deps, mismatched shared deps, version drift and missing fields.
 
 Monorepos rot quietly. A package bumps to 2.0.0 while a sibling still asks for `^1.0.0`, so the package manager fetches the old copy from the registry instead of linking the local one. One app moves to React 18 and another stays on 17. Two packages end up importing each other. A published package depends on a private one that users can never install. `monorepo-gauge` reads your workspace layout and reports these problems with the file, a severity and a **concrete fix**.
