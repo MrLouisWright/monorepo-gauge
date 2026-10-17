@@ -1,12 +1,16 @@
 # Changelog
 
-## 1.0.0 (2026-10-15)
+## 1.1.0 (2026-10-17)
+
+Re-release: these changes were committed after 1.0.0 was published but never reached npm. 1.0.0 on npm is the original first release.
 
 - Per-package field checks are delegated to pkg-field-gauge (`checkPackage`) and reported as `package-field` with its severities; private workspaces skip publishing-only rules. Replaces `missing-field`; `requiredFields` beyond pkg-field-gauge's own checks become `required-field` results.
 - `--fix` (with `--dry-run` and `--fix-majors`) rewrites internal ranges, `workspace:` protocol and style, fixed-mode versions, same-major dependency drift, version-group pins and `repository.directory`.
 - syncpack-style `versionGroups` with `pin`, `sameRange`, `banned` and `ignored` policies (rules `version-group-mismatch`, `banned-dependency`).
 - `workspace:` protocol consistency: `workspace-protocol-inconsistent` (mixed styles, `--protocol-style`) and `workspace-protocol-unsupported` (npm / yarn classic).
 - Dual ESM + CommonJS build with generated TypeScript declarations; CI checks require and import from the packed tarball.
+
+## 1.0.0 (2026-10-15)
 
 First release, by Louis Wright.
 

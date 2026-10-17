@@ -200,7 +200,7 @@ Types are included.
 
 ## Requirements
 
-Node.js 18 or newer. Zero runtime dependencies.
+Node.js 18 or newer. One runtime dependency: pkg-field-gauge.
 
 ## Support
 

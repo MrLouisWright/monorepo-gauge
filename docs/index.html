@@ -70,7 +70,7 @@
   <div class="wrap narrow">
     <h2><span class="h-ic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.5 2.5 20h19L12 3.5Z"/><path d="M12 10v4.5M12 17.5v.01"/></svg></span> Why it exists</h2>
     <p class="big">Monorepos rot quietly. A package bumps to 2.0.0 while a sibling still asks for “^1.0.0”, so the package manager fetches the old copy from the registry instead of linking the local one. One app moves to React 18 and another stays on 17. Two packages end up importing each other. A published package depends on a private one that users can never install. monorepo-gauge reads your workspace layout and reports these problems with the file, a severity and a concrete fix.</p>
-    <p class="big">CLI, library and GitHub Action. Node.js 18+, zero runtime dependencies. By Louis Wright.</p>
+    <p class="big">CLI, library and GitHub Action. Node.js 18+, one runtime dependency (pkg-field-gauge). By Louis Wright.</p>
   </div>
 </section>
 
