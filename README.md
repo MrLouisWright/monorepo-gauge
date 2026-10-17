@@ -184,7 +184,7 @@ jobs:
 | `job-summary` | Add the Markdown report to the job summary | `true` |
 | `args` | Extra CLI arguments | |
 
-The action runs the bundled CLI with Node 20; it has no dependencies to install. Pin it to a commit SHA if your policy requires it.
+The action sets up Node 20, installs monorepo-gauge's runtime dependency (pkg-field-gauge) from its lockfile with `npm ci --omit=dev --ignore-scripts`, then runs the CLI. Pin it to a commit SHA if your policy requires it.
 
 ## Library
 

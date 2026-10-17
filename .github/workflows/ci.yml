@@ -25,3 +25,11 @@ jobs:
         run: |
           node bin/monorepo-gauge.js test/fixtures/clean --fail-on low
           node bin/monorepo-gauge.js test/fixtures/messy --fail-on none
+  action:
+    # Runs the Action from a clean checkout (no node_modules) so a missing dependency install fails CI.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with: { persist-credentials: false }
+      - uses: ./
+        with: { path: test/fixtures/clean, fail-on: low }

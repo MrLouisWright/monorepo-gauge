@@ -17,6 +17,11 @@ runs:
   steps:
     - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
       with: { node-version: '20' }
+    - name: Install monorepo-gauge dependencies
+      shell: bash
+      env:
+        MG_DIR: ${{ github.action_path }}
+      run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund --prefix "$MG_DIR"
     - id: run
       shell: bash
       env:

@@ -1,6 +1,6 @@
 {
   "name": "monorepo-gauge",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Hygiene checks for npm/yarn/pnpm workspaces: circular internal dependencies, internal ranges that no longer match, shared dependency drift, duplicate names, public packages depending on private ones, per-package field checks via pkg-field-gauge, workspace: protocol consistency, syncpack-style version groups and version drift. Text/JSON/SARIF/Markdown, allowlist with expiry, GitHub Action. --fix for ranges and versions.",
   "type": "module",
   "main": "./dist/index.cjs",

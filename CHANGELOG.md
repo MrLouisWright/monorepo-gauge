@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.1 (2026-10-17)
+
+- Fix: the GitHub Action now installs monorepo-gauge's runtime dependency (pkg-field-gauge) with `npm ci --omit=dev --ignore-scripts` before running the CLI. Before this, the Action could not find pkg-field-gauge and failed.
+- CI runs the Action against the repository itself (`uses: ./`) from a clean checkout.
+- README no longer says the Action has no dependencies to install.
+
 ## 1.1.0 (2026-10-17)
 
 Re-release: these changes were committed after 1.0.0 was published but never reached npm. 1.0.0 on npm is the original first release.
