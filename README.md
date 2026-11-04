@@ -188,6 +188,12 @@ The action sets up Node 20, installs monorepo-gauge's runtime dependency (pkg-fi
 
 ## Library
 
+Install it in your project first:
+
+```bash
+npm install --save-dev monorepo-gauge
+```
+
 ```js
 import { check, applyFixes, satisfies, findCycles } from 'monorepo-gauge';
 const report = check('.', { versioning: 'fixed' });
